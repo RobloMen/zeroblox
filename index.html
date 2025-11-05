@@ -523,88 +523,80 @@
         </div>
     </footer>
 
-  <script>
-      // Плавная прокрутка к якорям
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-          anchor.addEventListener('click', function (e) {
-              e.preventDefault();
-              
-              const targetId = this.getAttribute('href');
-              if (targetId === '#') return;
-              
-              const targetElement = document.querySelector(targetId);
-              if (targetElement) {
-                  window.scrollTo({
-                      top: targetElement.offsetTop - 80,
-                      behavior: 'smooth'
-                  });
-              }
-          });
-      });
-      
-      // Обработка кнопки скачивания
-      document.getElementById('download-btn').addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          // Показать прогресс загрузки
-          const progressElement = document.getElementById('download-progress');
-          const progressBar = document.getElementById('progress');
-          const progressText = document.getElementById('progress-text');
-          
-          progressElement.style.display = 'block';
-          
-          // Имитация загрузки
-          let progress = 0;
-          const interval = setInterval(() => {
-              progress += Math.random() * 10;
-              if (progress >= 100) {
-                  progress = 100;
-                  clearInterval(interval);
-                  
-                  // После завершения "загрузки" начать реальное скачивание
-                  setTimeout(() => {
-                      // Создаем реальный файл для скачивания
-                      const content = `
-  ZeroBlox Game Installation File
-  Version: 1.4.2
-  Size: 24 MB
-  Platform: Windows
-  
-  This is the official ZeroBlox game installer.
-  Extract the contents and run Setup.exe to install the game.
-  
-  System Requirements:
-  - OS: Windows 7/8/10/11
-  - CPU: Intel Core i3 or equivalent
-  - RAM: 4GB
-  - Storage: 2GB free space
-  
-  Enjoy playing ZeroBlox!
-                      `;
-                      
-                      // Создаем blob с текстовым содержимым
-                      const blob = new Blob([content], { type: 'text/plain' });
-                      const url = URL.createObjectURL(blob);
-                      
-                      // Создаем ссылку для скачивания
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'Zeroblox_installer.exe'; // В реальном случае это был бы .exe или .zip
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      
-                      // Освобождаем память
-                      URL.revokeObjectURL(url);
-                      
-                      progressText.textContent = 'Загрузка завершена! Файл сохранен.';
-                  }, 500);
-              }
-              
-              progressBar.style.width = progress + '%';
-              progressText.textContent = Math.round(progress) + '%';
-          }, 200);
-      });
-  </script>
+    <script>
+        // Плавная прокрутка к якорям
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Обработка кнопки скачивания
+        document.getElementById('download-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Показать прогресс загрузки
+            const progressElement = document.getElementById('download-progress');
+            const progressBar = document.getElementById('progress');
+            const progressText = document.getElementById('progress-text');
+            
+            progressElement.style.display = 'block';
+            
+            // Имитация загрузки
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // После завершения "загрузки" начать реальное скачивание
+                    setTimeout(() => {
+                        // Скачивание файла из корневой директории сайта
+                        const fileName = 'Zeroblox_installer.exe'; // Имя файла в корне сайта
+                        
+                        // Создаем ссылку для скачивания
+                        const a = document.createElement('a');
+                        a.href = '/' + fileName; // Путь из корневой директории
+                        a.download = fileName;
+                        
+                        // Пытаемся скачать файл
+                        a.click();
+                        
+                        // Проверяем успешность скачивания
+                        setTimeout(() => {
+                            progressText.textContent = 'Загрузка завершена! Файл сохранен.';
+                            
+                            // Если файл не найден, показываем сообщение
+                            fetch('/' + fileName)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        progressText.textContent = 'Ошибка: Файл не найден на сервере';
+                                    }
+                                })
+                                .catch(error => {
+                                    progressText.textContent = 'Ошибка: Файл не найден на сервере';
+                                });
+                        }, 1000);
+                        
+                    }, 500);
+                }
+                
+                progressBar.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+            }, 200);
+        });
+    </script>
 </body>
 </html>
